@@ -2,6 +2,7 @@ require 'dependor/injectable.rb'
 require 'dependor/meta_data.rb'
 require 'dependor/injector.rb'
 require 'dependor/dependency_to_class_name_converter.rb'
+require 'dependor/spying_proxy.rb'
 
 module Dependor
   def self.dependency_to_class_name_converter

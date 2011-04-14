@@ -21,7 +21,7 @@ module Dependor
     end
 
     def isolate(instance)
-      return set_dependencies(instance) { |dependency_klass| dependency_klass.fake }
+      return set_dependencies(instance) { |dependency_klass| SpyingProxy.new(dependency_klass.fake) }
     end
 
     private

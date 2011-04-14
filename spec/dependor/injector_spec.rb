@@ -40,4 +40,37 @@ describe Dependor::Injector do
     end
   end
 
+  describe "isolated dependencies" do
+    it "should allow spying on them" do
+      bar = Bar.isolated
+
+      bar.hello # calls foo.name internally
+
+      bar.foo.__method_calls__.should include([:name, []])
+    end
+  end
+
+  describe "fancy rspec matcher for spying on fakes" do
+
+    require 'dependor/rspec_mathers.rb'
+    include Dependor::RSpecMatchers
+
+    before(:each) do
+      @foo = Bar.isolated.foo
+    end
+
+    it "should allow asserting that a method was called" do
+      @foo.do_stuff(:one, :two)
+
+      @foo.should have_received.do_stuff(:one, :two)
+    end
+
+    it "should allow asserting that a method was not called" do
+      @foo.do_stuff(:one, :two)
+
+      @foo.should_not have_received.name
+      @foo.should_not have_received.do_stuff(:one)
+    end
+  end
+
 end
