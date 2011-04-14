@@ -2,40 +2,6 @@ require File.expand_path('../../spec_helper.rb', __FILE__)
 
 describe Dependor::Injectable do
 
-  class Foo
-    def name
-      "world"
-    end
-  end
-
-  class Fake::Foo
-    def name
-      "fake"
-    end
-  end
-
-  class Bar
-    include Dependor::Injectable
-
-    depends_on :foo
-
-    def hello
-      return "Hello #{foo.name}!"
-    end
-  end
-
-  class Fake::Bar
-    def hello
-      "Hello?"
-    end
-  end
-
-  class Baz
-    include Dependor::Injectable
-
-    depends_on :bar
-  end
-
   describe ".make" do
     let(:baz) { Baz.make }
 
@@ -77,7 +43,7 @@ describe Dependor::Injectable do
     end
 
     it "should inject both parent and child dependencies" do
-      sample = DependencyInheritanceChild.new
+      sample = DependencyInheritanceChild.make
 
       sample.foo.should be_an_instance_of(Foo)
       sample.bar.should be_an_instance_of(Bar)

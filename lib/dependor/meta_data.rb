@@ -17,6 +17,8 @@ module Dependor
     def self.for(klass)
       if klass.respond_to?(:dependor_meta_data)
         return klass.dependor_meta_data
+      elsif !klass.is_a?(Class)
+        return self.for(klass.class)
       else
         return EmptyMetaData.new
       end

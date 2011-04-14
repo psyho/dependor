@@ -8,7 +8,7 @@ module Dependor
 
     module InstanceMethods
       def inject!
-        self
+        Dependor.injector.inject(self)
       end
     end
 

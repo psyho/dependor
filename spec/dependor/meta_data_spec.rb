@@ -53,4 +53,20 @@ describe Dependor::MetaData do
     end
   end
 
+  describe "for an instance of a class with no dependencies declared" do
+    it "should return empty metadata" do
+      metadata = Dependor::MetaData.for(NoMetaDataSample.new)
+
+      metadata.dependencies.should == Set.new
+    end
+  end
+
+  describe "for an instance of a class with some dependencies declared" do
+    it "should return the same metadata as for the class" do
+      metadata = Dependor::MetaData.for(SomeDependenciesSample.new)
+
+      metadata.dependencies.should == Set.new([:foo, :bar])
+    end
+  end
+
 end

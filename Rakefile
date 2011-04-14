@@ -9,3 +9,5 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = "./spec/**/*_spec.rb"
   t.rspec_opts = ["--profile --color --format=documentation"]
 end
+
+task :default => :spec
