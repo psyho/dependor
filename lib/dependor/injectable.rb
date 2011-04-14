@@ -7,6 +7,7 @@ module Dependor
     end
 
     module InstanceMethods
+
       def inject!
         Dependor.injector.inject(self)
       end
@@ -14,6 +15,7 @@ module Dependor
       def isolate!
         Dependor.injector.isolate(self)
       end
+
     end
 
     module ClassMethods
@@ -23,7 +25,11 @@ module Dependor
       end
 
       def depends_on(*dependency_names)
-        attr_accessor *dependency_names
+        dependency_names.each do |dependency_name|
+          attr_reader dependency_name unless instance_methods.include?(dependency_name)
+          attr_writer dependency_name unless instance_methods.include?(:"#{dependency_name}=")
+        end
+
         dependency_names.each { |name| dependor_meta_data.add_dependency(name) }
       end
 

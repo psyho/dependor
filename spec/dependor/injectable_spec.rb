@@ -12,6 +12,23 @@ describe Dependor::Injectable do
     it "should inject every object in the hierarchy" do
       baz.bar.foo.should be_an_instance_of(Foo)
     end
+
+    class DependencyInheritanceParent
+      include Dependor::Injectable
+
+      depends_on :foo
+    end
+
+    class DependencyInheritanceChild < DependencyInheritanceParent
+      depends_on :bar
+    end
+
+    it "should inject both inherited and declared dependencies" do
+      sample = DependencyInheritanceChild.make
+
+      sample.foo.should be_an_instance_of(Foo)
+      sample.bar.should be_an_instance_of(Bar)
+    end
   end
 
   describe ".isolated" do
@@ -43,24 +60,41 @@ describe Dependor::Injectable do
       sample.should respond_to(:bar)
       sample.should respond_to(:baz)
     end
-  end
 
-  describe "dependency inheritance" do
-    class DependencyInheritanceParent
+    it "should add getters for all of the dependencies" do
+      sample = DeclaringDependenciesSample.new
+
+      sample.should respond_to(:foo=)
+      sample.should respond_to(:bar=)
+      sample.should respond_to(:baz=)
+    end
+
+    class WithAlreadyDefinedGettersAndSetters
+      def foo
+        return "foo"
+      end
+
+      def bar=(new_bar)
+        @bar = "prefix_#{new_bar}"
+      end
+
       include Dependor::Injectable
 
-      depends_on :foo
+      depends_on :foo, :bar, :baz
     end
 
-    class DependencyInheritanceChild < DependencyInheritanceParent
-      depends_on :bar
+    it "should not override already existing getters" do
+      sample = WithAlreadyDefinedGettersAndSetters.new
+
+      sample.foo.should == "foo"
     end
 
-    it "should inject both parent and child dependencies" do
-      sample = DependencyInheritanceChild.make
+    it "should not override already existing setters" do
+      sample = WithAlreadyDefinedGettersAndSetters.new
 
-      sample.foo.should be_an_instance_of(Foo)
-      sample.bar.should be_an_instance_of(Bar)
+      sample.bar = "bar"
+
+      sample.bar.should == "prefix_bar"
     end
   end
 
