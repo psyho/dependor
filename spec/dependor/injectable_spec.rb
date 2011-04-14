@@ -14,6 +14,20 @@ describe Dependor::Injectable do
     end
   end
 
+  describe ".isolated" do
+    let(:baz) { Baz.isolated }
+
+    it "should create an object with all of the dependencies substituted by fakes" do
+      baz.bar.should be_an_instance_of(Fake::Bar)
+    end
+  end
+
+  describe ".fake" do
+    it "should return a new fake object" do
+      Bar.fake.should be_an_instance_of(Fake::Bar)
+    end
+  end
+
   describe "declaring dependencies" do
     class DeclaringDependenciesSample
       include Dependor::Injectable

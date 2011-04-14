@@ -10,6 +10,10 @@ module Dependor
       def inject!
         Dependor.injector.inject(self)
       end
+
+      def isolate!
+        Dependor.injector.isolate(self)
+      end
     end
 
     module ClassMethods
@@ -25,6 +29,14 @@ module Dependor
 
       def make
         new.inject!
+      end
+
+      def fake
+        Injector.class_for_name("Fake::#{name}").new
+      end
+
+      def isolated
+        new.isolate!
       end
 
     end
