@@ -42,7 +42,7 @@ module Dependor
       end
 
       def fake
-        Injector.class_for_name("Fake::#{name}").new
+        Dependor::Registry.class_for_name("Fake::#{name}").new
       end
 
       def isolated

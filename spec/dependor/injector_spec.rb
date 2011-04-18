@@ -3,7 +3,9 @@ require File.expand_path('../../spec_helper.rb', __FILE__)
 describe Dependor::Injector do
 
   before(:each) do
-    @injector = Dependor::Injector.new(Dependor::DependencyToClassNameConverter.new)
+    dependency_to_class_name_converter = Dependor::DependencyToClassNameConverter.new
+    registry = Dependor::Registry.new(dependency_to_class_name_converter)
+    @injector = Dependor::Injector.new(registry)
   end
 
   describe "for an instance of a class with no dependencies" do
