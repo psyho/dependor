@@ -11,7 +11,13 @@ module Dependor
     end
 
     def dependencies
-      @dependencies + superclass_dependencies
+      @dependencies + super_meta_data.dependencies
+    end
+
+    attr_writer :scope
+
+    def scope
+      @scope || super_meta_data.scope
     end
 
     def self.for(klass)
@@ -26,14 +32,19 @@ module Dependor
 
     private
 
-    def superclass_dependencies
-      self.class.for(@klass.superclass).dependencies
+    def super_meta_data
+      self.class.for(@klass.superclass)
     end
+
   end
 
   class EmptyMetaData
     def dependencies
       Set.new
+    end
+
+    def scope
+      :prototype
     end
   end
 

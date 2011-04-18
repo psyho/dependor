@@ -17,7 +17,7 @@ module Dependor
     end
 
     def inject(instance)
-      return set_dependencies(instance) { |dependency_klass| inject(dependency_klass.new) }
+      return set_dependencies(instance) { |dependency_klass| inject(get_instance(dependency_klass)) }
     end
 
     def isolate(instance)
@@ -25,6 +25,26 @@ module Dependor
     end
 
     private
+
+    def singleton_registry
+      @singleton_registry ||= {}
+    end
+
+    def singleton?(klass)
+      Dependor::MetaData.for(klass).scope == :singleton
+    end
+
+    def get_instance(klass)
+      if singleton?(klass)
+        return singleton_registry[klass] ||= new_instance(klass)
+      else
+        return new_instance(klass)
+      end
+    end
+
+    def new_instance(klass)
+      klass.new
+    end
 
     def set_dependencies(instance, &block)
       meta_data = Dependor::MetaData.for(instance)

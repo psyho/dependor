@@ -98,4 +98,37 @@ describe Dependor::Injectable do
     end
   end
 
+  describe "scoping dependencies" do
+    class SampleSingleton
+      include Dependor::Injectable
+
+      scope :singleton
+    end
+
+    class SamplePrototype
+      include Dependor::Injectable
+
+      scope :prototype
+    end
+
+    class ScopingExample
+      include Dependor::Injectable
+
+      depends_on :sample_singleton, :sample_prototype
+    end
+
+    before(:each) do
+      @sample_one = ScopingExample.make
+      @sample_two = ScopingExample.make
+    end
+
+    it "always injects the same instance for singleton scoped classes" do
+      @sample_one.sample_singleton.should equal(@sample_two.sample_singleton)
+    end
+
+    it "always creates a new instance of the prototype scoped classes" do
+      @sample_one.sample_prototype.should_not equal(@sample_two.sample_prototype)
+    end
+  end
+
 end

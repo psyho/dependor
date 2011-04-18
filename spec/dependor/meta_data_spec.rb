@@ -69,4 +69,34 @@ describe Dependor::MetaData do
     end
   end
 
+  class ScopeDefinitionSample
+    include Dependor::Injectable
+
+    scope :singleton
+  end
+
+  describe "for a class with scope declaration" do
+    it "should return that scope" do
+      metadata = Dependor::MetaData.for(ScopeDefinitionSample)
+
+      metadata.scope.should == :singleton
+    end
+  end
+
+  describe "for a class with no scope declaration" do
+    it "should return :prototype as scope" do
+      metadata = Dependor::MetaData.for(Bar)
+
+      metadata.scope.should == :prototype
+    end
+  end
+
+  describe "for a class not including Dependor::Injectable" do
+    it "should return :prototype as scope" do
+      metadata = Dependor::MetaData.for(NoMetaDataSample)
+
+      metadata.scope.should == :prototype
+    end
+  end
+
 end

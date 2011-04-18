@@ -33,6 +33,10 @@ module Dependor
         dependency_names.each { |name| dependor_meta_data.add_dependency(name) }
       end
 
+      def scope(scope_name)
+        dependor_meta_data.scope = scope_name
+      end
+
       def make
         new.inject!
       end
