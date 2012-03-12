@@ -7,6 +7,14 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.2)
+    ffi (1.0.11)
+    growl (1.0.3)
+    guard (1.0.1)
+      ffi (>= 0.5.0)
+      thor (~> 0.14.6)
+    guard-rspec (0.6.0)
+      guard (>= 0.10.0)
+    libnotify (0.7.2)
     rspec (2.5.0)
       rspec-core (~> 2.5.0)
       rspec-expectations (~> 2.5.0)
@@ -15,10 +23,15 @@ GEM
     rspec-expectations (2.5.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.5.0)
+    thor (0.14.6)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   dependor!
+  growl
+  guard
+  guard-rspec
+  libnotify
   rspec
