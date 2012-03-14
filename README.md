@@ -1,4 +1,4 @@
-# Dependor
+# Dependor {<img src="https://secure.travis-ci.org/psyho/dependor.png" />}[http://travis-ci.org/psyho/dependor]
 
 ## What is Dependor
 
