@@ -4,21 +4,18 @@ module Dependor
     class UnknownObject < StandardError; end
 
     def self.included(klass)
-      klass.send(:include, InstanceMethods)
       klass.extend ClassMethods
     end
 
-    module InstanceMethods
-      def method_missing(name, *args, &block)
-        raise UnknownObject.new("Injector does not know how to create object: #{name}") unless respond_to?(name)
+    def method_missing(name, *args, &block)
+      raise UnknownObject.new("Injector does not know how to create object: #{name}") unless respond_to?(name)
 
-        klass = PrivateMethods.class_for_object_name(name, self.class.search_modules)
-        PrivateMethods.construct_object(klass, self)
-      end
+      klass = PrivateMethods.class_for_object_name(name, self.class.search_modules)
+      PrivateMethods.construct_object(klass, self)
+    end
 
-      def respond_to?(name)
-        super || !!PrivateMethods.class_for_object_name(name, self.class.search_modules)
-      end
+    def respond_to?(name)
+      super || !!PrivateMethods.class_for_object_name(name, self.class.search_modules)
     end
 
     module ClassMethods
