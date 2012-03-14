@@ -1,5 +1,5 @@
 module Dependor
-  module AutomagicallyInjectsDependencies
+  module AutoInject
 
     class UnknownObject < StandardError; end
 
@@ -59,6 +59,5 @@ module Dependor
     end
   end
 
-  AutoInject = AutomagicallyInjectsDependencies
 end
 

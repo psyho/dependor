@@ -2,7 +2,7 @@ require_relative '../spec_helper'
 
 require 'dependor/shorty'
 
-describe Dependor::AutomagicallyInjectsDependencies do
+describe Dependor::AutoInject do
   class SampleClassWithNoDependencies
   end
 
@@ -20,7 +20,7 @@ describe Dependor::AutomagicallyInjectsDependencies do
   end
 
   class SampleInjector
-    include Dependor::AutomagicallyInjectsDependencies
+    include Dependor::AutoInject
     look_in_modules SomeModule
 
     def manual_dep
