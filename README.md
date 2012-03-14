@@ -79,7 +79,8 @@ class Injector
 end
 
 class EntryPoint
-  include Dependor::Injectable(Injector)
+  include Dependor::Injectable
+  inject_from Injector
   
   inject :bar
 
@@ -213,6 +214,61 @@ end
 ## Dependor::Injectable
 
 You can include this to make usage of the injector more convenient.
+This is used in the entry point of your application, typically a Rails controller.
+
+```ruby
+class MyInjector
+  def foo
+    "foo"
+  end
+end
+
+class ApplicationController
+  extend Dependor::Injectable
+  inject_from MyInjector
+end
+
+class PostsController < ApplicationController
+  inject :foo
+
+  def get
+    render text: foo
+  end
+end
+```
+
+Sometimes you might want to pass request, params or session to your injector.
+Here is an example, how to do it:
+
+```ruby
+require 'dependor/shorty'
+
+class MyInjector
+  include Dependor::AutoInject
+  
+  takes :params, :session, :request
+
+  def foo
+    session[:foo]
+  end
+end
+
+class ApplicationController
+  extend Dependor::Injectable
+
+  def injector
+    @injector ||= MyInjector.new(params, session, request)
+  end
+end
+
+class PostsController < ApplicationController
+  inject :foo
+
+  def get
+    render text: foo
+  end
+end
+```
 
 ## License
 
