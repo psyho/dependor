@@ -6,20 +6,26 @@ module Dependor
     def initialize(injector, search_modules)
       @injector = injector
       @search_modules = search_modules
+      @instantiator = Instantiator.new(self)
     end
 
     def get(name)
+      return injector.send(name) if method_exists?(name)
       raise UnknownObject.new("Injector does not know how to create object: #{name}") unless resolvable?(name)
 
       klass = class_for_object_name(name)
-      construct_object(klass)
+      @instantiator.instantiate(klass)
     end
 
     def resolvable?(name)
-      injector.methods.include?(name) || !!class_for_object_name(name)
+      method_exists?(name) || !!class_for_object_name(name)
     end
 
     private
+
+    def method_exists?(name)
+      injector.methods.include?(name)
+    end
 
     def camelize(symbol)
       string = symbol.to_s
@@ -40,12 +46,6 @@ module Dependor
       klass
     end
 
-    def construct_object(klass)
-      params = klass.instance_method(:initialize).parameters
-      dependency_names = params.select{|type, name| type == :req}.map{|type, name| name}
-      dependencies = dependency_names.map{|name| injector.send(name)}
-      return klass.new(*dependencies)
-    end
   end
 
 end
