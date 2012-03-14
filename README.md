@@ -272,9 +272,15 @@ end
 
 ## License
 
-MIT. See the LICENSE file.
+MIT. See the MIT-LICENSE file.
 
 ## Author
 
 Adam Pohorecki
 
+## Acknowledgements
+
+Dependor::Shorty is inspired (or rather blatantly copied) from Gary Bernhardt's [Destroy All Software Screencast][das] ["Shorter Class Syntax"][shorter-syntax].
+
+[das]: http://www.destroyallsoftware.com
+[shorter-syntax]: https://www.destroyallsoftware.com/screencasts/catalog/shorter-class-syntax
