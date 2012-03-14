@@ -29,7 +29,6 @@ describe Dependor::AutoInject do
   end
 
   let(:injector) { SampleInjector.new }
-  let(:object_class) { constantize(camelize(object_name)) }
 
   shared_examples_for 'dependency injector' do
     it 'responds to the object name' do
@@ -43,18 +42,21 @@ describe Dependor::AutoInject do
 
   context 'no dependencies' do
     let(:object_name) { :sample_class_with_no_dependencies }
+    let(:object_class) { SampleClassWithNoDependencies }
 
     it_behaves_like 'dependency injector'
   end
 
   context 'dependencies on other objects' do
     let(:object_name) { :sample_class_with_dependency }
+    let(:object_class) { SampleClassWithDependency }
 
     it_behaves_like 'dependency injector'
   end
 
   context 'dependencies on objects returned by methods on the injector' do
     let(:object_name) { :sample_class_with_manual_dependency }
+    let(:object_class) { SampleClassWithManualDependency }
 
     it_behaves_like 'dependency injector'
   end
@@ -67,18 +69,11 @@ describe Dependor::AutoInject do
   end
 
   it "raises an error if the object is not found" do
-    proc{ injector.unknown_object }.should raise_exception(Dependor::AutoInject::UnknownObject)
+    proc{ injector.unknown_object }.should raise_exception(Dependor::UnknownObject)
   end
 
   it 'responds to regular methods on injector' do
     injector.should respond_to(:manual_dep)
   end
 
-  def camelize(string)
-    Dependor::AutoInject::PrivateMethods.camelize(string)
-  end
-
-  def constantize(string)
-    Object.const_get(string)
-  end
 end
