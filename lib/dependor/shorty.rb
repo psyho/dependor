@@ -3,6 +3,7 @@ module Dependor
     def takes(*names)
       attr_reader *names
       include Dependor::Constructor(*names)
+      extend Dependor::Let
     end
   end
 end

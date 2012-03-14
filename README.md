@@ -73,7 +73,7 @@ class Bar
 end
 
 class Injector
-  include Dependor::AutomagicallyInjectsDependencies
+  include Dependor::AutoInject
 end
 
 class EntryPoint
@@ -89,14 +89,124 @@ end
 EntryPoint.new.run
 ```
 
-## Dependor::AutomagicallyInjectsDependencies
+## Dependor::AutoInject
 
 This is the core part of the library.
 It looks at the constructor of a class to find out it's dependencies and instantiates it's instances with proper objects injected.
+It looks up classes by name.
+
+AutoInject can also use the methods declared on injector as injection sources, which is quite useful for things like configuration.
+
+```ruby
+class Injector
+  include Dependor::AutoInject
+
+  attr_reader :session
+
+  def initialize(session)
+    @session = session
+  end
+
+  let(:current_user) { current_user_service.get }
+  let(:users_repository) { User }
+  let(:comments_repository) { Comment }
+end
+
+class CurrentUserService
+  takes :session, :users_repository
+
+  def get
+    @current_user ||= users_repository.find(session[:current_user_id])
+  end
+end
+
+class CreatesComments
+  takes :current_user, :comments_repository
+
+  def create
+    # ...
+  end
+end
+
+class User < ActiveRecord::Base
+end
+
+class Comment < ActiveRecord::Base
+end
+```
 
 ## Dependor::Shorty
 
-This makes the constructor definition less verbose.
+This makes the constructor definition less verbose and includes Dependor::Let for shorter method definition syntax.
+
+```ruby
+class Foo
+  takes :foo, :bar, :baz
+  let(:hello) { "world" }
+end
+```
+
+is equivalent to:
+
+```ruby
+class Foo
+  attr_reader :foo, :bar, :baz
+
+  def initialize(foo, bar, baz)
+    @foo = foo
+    @bar = bar
+    @baz = baz
+  end
+
+  def hello
+    "world"
+  end
+end
+```
+
+## Dependor::Constructor
+
+Sometimes you don't want to pollute every class with a `takes` method.
+You can then shorten the class declaration with Dependor::Constructor.
+
+```ruby
+class Foo
+  include Dependor::Constructor(:foo, :bar, :baz)
+end
+```
+
+is equivalent to:
+
+```ruby
+class Foo
+  def initialize(foo, bar, baz)
+    @foo = foo
+    @bar = bar
+    @baz = baz
+  end
+end
+```
+
+## Dependor::Let
+
+It allows a simpler syntax to define getter methods.
+
+```ruby
+class Foo
+  def foo
+    do_something_or_other
+  end
+end
+```
+
+becomes:
+
+```ruby
+class Foo
+  extend Dependor::Let
+  let(:foo) { do_something_or_other }
+end
+```
 
 ## Dependor::Injectable
 
