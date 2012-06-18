@@ -10,14 +10,17 @@ module Dependor
     def get(name)
       ensure_resolvable!(name)
 
-      return @injector.send(name) if method_exists?(name)
+      if has_method?(name)
+        return @injector.send(name) if no_arguments?(name)
+        return @injector.method(name).to_proc
+      end
 
       klass = @class_name_resolver.for_name(name)
       @instantiator.instantiate(klass)
     end
 
     def resolvable?(name)
-      method_exists?(name) || !!@class_name_resolver.for_name(name)
+      has_method?(name) || !!@class_name_resolver.for_name(name)
     end
 
     private
@@ -28,8 +31,12 @@ module Dependor
       end
     end
 
-    def method_exists?(name)
+    def has_method?(name)
       @injector.methods.include?(name)
+    end
+
+    def no_arguments?(name)
+      @injector.method(name).arity == 0
     end
 
   end

@@ -14,6 +14,10 @@ describe Dependor::AutoInject do
     takes :manual_dep
   end
 
+  class DependsOnFactoryMethod
+    takes :create_foo
+  end
+
   module SomeModule
     class SampleClassWithinSomeModule
     end
@@ -88,6 +92,14 @@ describe Dependor::AutoInject do
 
     it "passes through the dependencies that were specified" do
       injector.create_foo("the foo name").foo.should == "the foo name"
+    end
+  end
+
+  context 'injecting factory methods' do
+    it "injects factory methods as procs" do
+      object = injector.depends_on_factory_method
+
+      object.create_foo.call("test").foo.should == "test"
     end
   end
 
