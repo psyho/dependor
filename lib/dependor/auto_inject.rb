@@ -1,6 +1,5 @@
 module Dependor
   module AutoInject
-
     module ClassMethods
       def look_in_modules(*modules)
         search_modules.concat(modules)
@@ -21,6 +20,12 @@ module Dependor
 
     def respond_to?(name)
       auto_injector.resolvable?(name)
+    end
+
+    def inject(klass, overrides = {})
+      injector = Dependor::CustomizedInjector.new(auto_injector, overrides)
+      instantiator = Dependor::Instantiator.new(injector)
+      instantiator.instantiate(klass)
     end
 
     private

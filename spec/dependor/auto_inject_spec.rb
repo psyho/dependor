@@ -19,12 +19,25 @@ describe Dependor::AutoInject do
     end
   end
 
+  class SomeFactory
+    attr_reader :foo, :sample_class_with_no_dependencies
+
+    def initialize(foo, sample_class_with_no_dependencies)
+      @foo = foo
+      @sample_class_with_no_dependencies = sample_class_with_no_dependencies
+    end
+  end
+
   class SampleInjector
     include Dependor::AutoInject
     look_in_modules SomeModule
 
     def manual_dep
       "manual dep"
+    end
+
+    def create_foo(foo_name)
+      inject(SomeFactory, foo: foo_name)
     end
   end
 
@@ -66,6 +79,16 @@ describe Dependor::AutoInject do
     let(:object_class) { SomeModule::SampleClassWithinSomeModule }
 
     it_behaves_like 'dependency injector'
+  end
+
+  context 'autoinjecting with custom dependencies' do
+    it "injects the dependencies which are not explicitly specified" do
+      injector.create_foo("the foo name").sample_class_with_no_dependencies.should be_an_instance_of(SampleClassWithNoDependencies)
+    end
+
+    it "passes through the dependencies that were specified" do
+      injector.create_foo("the foo name").foo.should == "the foo name"
+    end
   end
 
   it "raises an error if the object is not found" do
