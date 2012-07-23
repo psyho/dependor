@@ -12,6 +12,10 @@ describe Dependor::Isolate do
       isolate(ExampleSubject)
     end
 
+    def override
+      isolate(ExampleSubject, bar: "bar was overriden")
+    end
+
     def foo
       "the foo stub"
     end
@@ -26,5 +30,12 @@ describe Dependor::Isolate do
 
     context.subject.foo.should == "the foo stub"
     context.subject.bar.should == "the bar stub"
+  end
+
+  it "allows overriding dependencies" do
+    context = ExampleContext.new
+
+    context.override.bar.should == "bar was overriden"
+    context.override.foo.should == "the foo stub"
   end
 end
