@@ -271,6 +271,54 @@ class PostsController < ApplicationController
 end
 ```
 
+## Testing
+
+Dependor doesn't add any dependencies to your classes so you can test them any way you like.
+
+Following class:
+
+```ruby
+class PostCreator
+  takes :post_repository
+
+  def publish(post)
+     post_repository.store(post)
+  end
+end
+```
+
+can be tested:
+
+```ruby
+let(:post_repository) { stub }
+let(:creator) { PostCreator.new(post_repository }
+
+it "stores posts" do
+  post = Post.new
+  post_repository.expects(:store).with(post)
+  creator.publish(post)
+end
+```
+
+## Dependor::Isolate
+
+Dependor::Isolate provides `isolate` function that creates an instance of given class with dependencies taken from a local context. It can be easily integrated with rspec by requiring 'dependor/rspec'.
+
+Previous example can be rewritten as:
+
+```ruby
+require 'dependor/rspec'
+
+let(:post_repository) { stub }
+let(:creator) { isolate(PostCreator) }
+
+it "stores posts" do
+  post = Post.new
+  post_repository.expects(store).with(post)
+  creator.publish(post)
+end
+```
+
 ## License
 
 MIT. See the MIT-LICENSE file.
