@@ -310,10 +310,24 @@ Previous example can be rewritten as:
 require 'dependor/rspec'
 
 let(:post_repository) { stub }
-let(:creator) { isolate(PostCreator) }
+let(:creator) { isolate{PostCreator} }
 
 it "stores posts" do
   post = Post.new
+  post_repository.expects(store).with(post)
+  creator.publish(post)
+end
+```
+
+Isolate captures even local variables:
+
+```ruby
+require 'dependor/rspec'
+
+it "stores posts" do
+  post = Post.new
+  post_repository = stub
+  creator = isolate{PostCreator}
   post_repository.expects(store).with(post)
   creator.publish(post)
 end

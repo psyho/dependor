@@ -5,6 +5,7 @@ module Dependor
   autoload :AutoInjector,       'dependor/auto_injector'
   autoload :ClassNameResolver,  'dependor/class_name_resolver'
   autoload :CustomizedInjector, 'dependor/customized_injector'
+  autoload :EvaluatingInjector, 'dependor/evaluating_injector'
   autoload :Injectable,         'dependor/injectable'
   autoload :Instantiator,       'dependor/instantiator'
   autoload :Isolate,            'dependor/isolate'

@@ -9,11 +9,12 @@ describe Dependor::Isolate do
     include Dependor::Isolate
 
     def subject
-      isolate(ExampleSubject)
+      isolate{ExampleSubject}
     end
 
     def override
-      isolate(ExampleSubject, bar: "bar was overriden")
+      bar = "bar was overriden"
+      isolate{ExampleSubject}
     end
 
     def foo

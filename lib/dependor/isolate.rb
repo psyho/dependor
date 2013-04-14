@@ -1,8 +1,9 @@
 module Dependor::Isolate
-  def isolate(klass, overrides = {})
-    injector = Dependor::SendingInjector.new(self)
-    customized_injector = Dependor::CustomizedInjector.new(injector, overrides)
-    instantiator = Dependor::Instantiator.new(customized_injector)
+  def isolate(&block)
+    klass = block.call
+    caller_binding = block.binding
+    injector = Dependor::EvaluatingInjector.new(caller_binding)
+    instantiator = Dependor::Instantiator.new(injector)
     instantiator.instantiate(klass)
   end
 end
