@@ -3,6 +3,7 @@
 [![build status](https://secure.travis-ci.org/psyho/dependor.png)](http://travis-ci.org/psyho/dependor)
 [![Code Climate](https://codeclimate.com/github/psyho/dependor.png)](https://codeclimate.com/github/psyho/dependor)
 [![Coverage Status](https://coveralls.io/repos/psyho/dependor/badge.png)](https://coveralls.io/r/psyho/dependor)
+[![Gem Version](https://badge.fury.io/rb/dependor.png)](http://badge.fury.io/rb/dependor)
 
 ## What is Dependor
 
