@@ -1,3 +1,6 @@
+require 'coveralls'
+Coveralls.wear!
+
 $:.push File.expand_path("../../lib", __FILE__)
 
 require 'rubygems'

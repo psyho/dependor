@@ -1,5 +1,6 @@
 pkg/*
 *.gem
+coverage/
 .bundle
 .rvmrc
 tags
