@@ -4,6 +4,7 @@
 [![Code Climate](https://codeclimate.com/github/psyho/dependor.png)](https://codeclimate.com/github/psyho/dependor)
 [![Coverage Status](https://coveralls.io/repos/psyho/dependor/badge.png)](https://coveralls.io/r/psyho/dependor)
 [![Gem Version](https://badge.fury.io/rb/dependor.png)](http://badge.fury.io/rb/dependor)
+[![Dependency Status](https://gemnasium.com/psyho/dependor.png)](https://gemnasium.com/psyho/dependor)
 
 ## What is Dependor
 
