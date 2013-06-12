@@ -17,6 +17,10 @@ describe Dependor::Isolate do
       isolate{ExampleSubject}
     end
 
+    def parameters
+      isolate(ExampleSubject, bar: "the parameter")
+    end
+
     def foo
       "the foo stub"
     end
@@ -26,17 +30,20 @@ describe Dependor::Isolate do
     end
   end
 
-  it "injects the subject's dependencies using methods on context" do
-    context = ExampleContext.new
+  let(:context) { ExampleContext.new }
 
+  it "injects the subject's dependencies using methods on context" do
     context.subject.foo.should == "the foo stub"
     context.subject.bar.should == "the bar stub"
   end
 
-  it "allows overriding dependencies" do
-    context = ExampleContext.new
-
+  it "allows overriding dependencies with variables" do
     context.override.bar.should == "bar was overriden"
     context.override.foo.should == "the foo stub"
+  end
+
+  it "allows overriding dependencies with parameters" do
+    context.parameters.bar.should == "the parameter"
+    context.parameters.foo.should == "the foo stub"
   end
 end

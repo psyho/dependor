@@ -313,7 +313,7 @@ Previous example can be rewritten as:
 require 'dependor/rspec'
 
 let(:post_repository) { stub }
-let(:creator) { isolate{PostCreator} }
+let(:creator) { isolate(PostCreator) }
 
 it "stores posts" do
   post = Post.new
@@ -322,18 +322,18 @@ it "stores posts" do
 end
 ```
 
-Isolate captures even local variables:
+Dependencies are taken from methods available in local context, but they can be specified in paramaters as well:
 
 ```ruby
-require 'dependor/rspec'
+post_repository = stub
+creator = isolate(PostCreator, post_repository: post_repository)
+```
 
-it "stores posts" do
-  post = Post.new
-  post_repository = stub
-  creator = isolate{PostCreator}
-  post_repository.expects(store).with(post)
-  creator.publish(post)
-end
+Or they can be captured from local variables when syntax with block is used:
+
+```ruby
+post_repository = stub
+creator = isolate{PostCreator}
 ```
 
 ## License
