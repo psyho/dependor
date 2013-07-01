@@ -3,4 +3,5 @@ pkg/*
 coverage/
 .bundle
 .rvmrc
+.ruby-version
 tags
