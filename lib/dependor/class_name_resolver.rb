@@ -8,7 +8,7 @@ module Dependor
 
     def for_name(name)
       class_name = camelize(name)
-      modules = search_modules.concat([Object])
+      modules = search_modules + [Object]
       klass = nil
 
       modules.each do |mod|
