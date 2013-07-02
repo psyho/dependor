@@ -40,4 +40,11 @@ describe Dependor::ClassNameResolver do
 
     resolver.for_name(:foo_bar_baz_2).should == FooBarBaz2
   end
+
+  it "doesnt have Object in search modules after calling for_name" do
+    resolver = Dependor::ClassNameResolver.new([])
+
+    resolver.for_name(:something)
+    resolver.search_modules.should_not include(Object)
+  end
 end
