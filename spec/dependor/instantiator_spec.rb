@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe Dependor::Instantiator do
   let(:injector) { double(:injector) }
-  let(:instantiator) { Dependor::Instantiator.new(injector) }
+  let(:dependency_names) { Dependor::DependencyNamesCache.new }
+  let(:instantiator) { Dependor::Instantiator.new(injector, dependency_names) }
 
   it "instantiates objects with no-arg constructors" do
     klass = Class.new do

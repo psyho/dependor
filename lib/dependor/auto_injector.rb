@@ -1,9 +1,9 @@
 module Dependor
   class AutoInjector
 
-    def initialize(injector, search_modules)
+    def initialize(injector, dependency_names, search_modules)
       @injector = injector
-      @instantiator = Instantiator.new(self)
+      @instantiator = Instantiator.new(self, dependency_names)
       @class_name_resolver = ClassNameResolver.new(search_modules)
     end
 

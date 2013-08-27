@@ -9,7 +9,8 @@ module Dependor
         sending_injector = SendingInjector.new(self)
         injector = CustomizedInjector.new(sending_injector, overrides)
       end
-      instantiator = Instantiator.new(injector)
+      dependecy_names = DependencyNamesCache.new
+      instantiator = Instantiator.new(injector, dependecy_names)
       instantiator.instantiate(klass)
     end
   end
