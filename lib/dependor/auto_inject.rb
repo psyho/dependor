@@ -15,11 +15,11 @@ module Dependor
     end
 
     def method_missing(name, *args, &block)
-      auto_injector.get(name)
+      auto_injector.get_by_class_name(name)
     end
 
-    def respond_to?(name)
-      auto_injector.resolvable?(name)
+    def respond_to_missing?(name, include_private = false)
+      auto_injector.class_exists?(name)
     end
 
     def inject(klass, overrides = {})
