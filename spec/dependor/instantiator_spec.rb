@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Dependor::Instantiator do
-  let(:injector) { stub(:injector) }
+  let(:injector) { double(:injector) }
   let(:instantiator) { Dependor::Instantiator.new(injector) }
 
   it "instantiates objects with no-arg constructors" do

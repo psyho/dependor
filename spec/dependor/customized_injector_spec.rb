@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Dependor::CustomizedInjector do
-  let(:other_injector) { stub }
+  let(:other_injector) { double }
 
   it "returns the customized dependency if given" do
     injector = Dependor::CustomizedInjector.new(other_injector, foo: 'hello')

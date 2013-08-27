@@ -5,3 +5,4 @@ coverage/
 .rvmrc
 .ruby-version
 tags
+tmp
