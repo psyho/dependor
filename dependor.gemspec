@@ -8,9 +8,10 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Adam Pohorecki"]
   s.email       = ["adam@pohorecki.pl"]
-  s.homepage    = "http://github.com/psyho/dependor"
+  s.homepage    = "https://github.com/psyho/dependor"
   s.summary     = %q{A couple of classes and modules that simplify dependency injection in Ruby.}
-  s.description = %q{Dependor is not a framework for Dependency Injection, but something thatt reduces duplication a little bit when doing manual dependency injection in settings like Rails apps.}
+  s.description = %q{Dependor is not a framework for Dependency Injection, but something that reduces duplication a little bit when doing manual dependency injection in settings like Rails apps.}
+  s.license     = "MIT"
 
   s.rubyforge_project = "dependor"
 
