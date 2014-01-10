@@ -39,7 +39,7 @@ describe Dependor::Injectable do
   it "uses the provided injector" do
     injectable = SampleInjectable.new
 
-    injectable.hello_foo.should == 'hello foo'
+    expect(injectable.hello_foo).to eq('hello foo')
   end
 
   describe "typical Rails usage" do
@@ -57,7 +57,7 @@ describe Dependor::Injectable do
     end
 
     it "should return foo value in child controller" do
-      PostsController.new.get.should == "render foo"
+      expect(PostsController.new.get).to eq("render foo")
     end
   end
 end

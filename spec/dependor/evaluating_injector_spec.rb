@@ -8,7 +8,7 @@ describe Dependor::EvaluatingInjector do
 
     injector = Dependor::EvaluatingInjector.new(binding)
 
-    injector.get(:baz).should == "the method baz"
+    expect(injector.get(:baz)).to eq("the method baz")
   end
 
   it 'evaluates local variables in given binding' do
@@ -16,6 +16,6 @@ describe Dependor::EvaluatingInjector do
 
     injector = Dependor::EvaluatingInjector.new(binding)
 
-    injector.get(:bar).should == "the local bar"
+    expect(injector.get(:bar)).to eq("the local bar")
   end
 end

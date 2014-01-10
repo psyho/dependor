@@ -33,17 +33,17 @@ describe Dependor::Isolate do
   let(:context) { ExampleContext.new }
 
   it "injects the subject's dependencies using methods on context" do
-    context.subject.foo.should == "the foo stub"
-    context.subject.bar.should == "the bar stub"
+    expect(context.subject.foo).to eq("the foo stub")
+    expect(context.subject.bar).to eq("the bar stub")
   end
 
   it "allows overriding dependencies with variables" do
-    context.override.bar.should == "bar was overriden"
-    context.override.foo.should == "the foo stub"
+    expect(context.override.bar).to eq("bar was overriden")
+    expect(context.override.foo).to eq("the foo stub")
   end
 
   it "allows overriding dependencies with parameters" do
-    context.parameters.bar.should == "the parameter"
-    context.parameters.foo.should == "the foo stub"
+    expect(context.parameters.bar).to eq("the parameter")
+    expect(context.parameters.foo).to eq("the foo stub")
   end
 end

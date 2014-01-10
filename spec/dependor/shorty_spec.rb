@@ -18,16 +18,16 @@ describe Dependor::Shorty do
   subject{ SampleClassThatUsesTakes.new('foo value', 'bar value', 'baz value') }
 
   it 'defines a constructor with given names' do
-    subject.as_instance_variables.should == { foo: 'foo value',
+    expect(subject.as_instance_variables).to eq({ foo: 'foo value',
       bar: 'bar value',
       baz: 'baz value'
-    }
+    })
   end
 
   it 'defines attr_reader for the given names' do
-    subject.as_attributes.should == { foo: 'foo value',
+    expect(subject.as_attributes).to eq({ foo: 'foo value',
       bar: 'bar value',
       baz: 'baz value'
-    }
+    })
   end
 end

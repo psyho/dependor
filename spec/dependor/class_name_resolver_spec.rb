@@ -20,31 +20,31 @@ describe Dependor::ClassNameResolver do
   it "returns nil when the class could not be found" do
     resolver = Dependor::ClassNameResolver.new([])
 
-    resolver.for_name(:something).should be_nil
+    expect(resolver.for_name(:something)).to be_nil
   end
 
   it "uses global scope with no search_modules" do
     resolver = Dependor::ClassNameResolver.new([])
 
-    resolver.for_name(:foo_bar_baz).should == FooBarBaz
+    expect(resolver.for_name(:foo_bar_baz)).to eq(FooBarBaz)
   end
 
   it "searches modules in order specified" do
     resolver = Dependor::ClassNameResolver.new([Foo, Bar])
 
-    resolver.for_name(:foo_bar_baz).should == Foo::FooBarBaz
+    expect(resolver.for_name(:foo_bar_baz)).to eq(Foo::FooBarBaz)
   end
 
   it "searches in order specified, with the global scope last" do
     resolver = Dependor::ClassNameResolver.new([Foo, Bar])
 
-    resolver.for_name(:foo_bar_baz_2).should == FooBarBaz2
+    expect(resolver.for_name(:foo_bar_baz_2)).to eq(FooBarBaz2)
   end
 
   it "doesnt have Object in search modules after calling for_name" do
     resolver = Dependor::ClassNameResolver.new([])
 
     resolver.for_name(:something)
-    resolver.search_modules.should_not include(Object)
+    expect(resolver.search_modules).not_to include(Object)
   end
 end
