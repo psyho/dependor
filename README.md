@@ -278,7 +278,7 @@ end
 
 You can include this to make your service class as a singleton.
 
-```
+```ruby
 class FooService
   include Dependor::Singleton
 end
