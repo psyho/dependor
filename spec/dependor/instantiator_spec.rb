@@ -35,4 +35,24 @@ describe Dependor::Instantiator do
 
     instance.foo.should == 'foo-bar-baz'
   end
+
+  it "instantiates objects as a new object" do
+    klass = Class.new {}
+
+    first_instance = instantiator.instantiate(klass)
+    second_instance = instantiator.instantiate(klass)
+
+    first_instance.object_id.should_not == second_instance.object_id
+  end
+
+  it "instantiates objects as a singleton object" do
+    klass = Class.new do
+      include Dependor::Singleton
+    end
+
+    first_instance = instantiator.instantiate(klass)
+    second_instance = instantiator.instantiate(klass)
+
+    first_instance.object_id.should == second_instance.object_id
+  end
 end
