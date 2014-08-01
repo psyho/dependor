@@ -4,5 +4,6 @@ coverage/
 .bundle
 .rvmrc
 .ruby-version
+.ruby-gemset
 tags
 tmp
