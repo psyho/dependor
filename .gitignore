@@ -6,4 +6,3 @@ coverage/
 .ruby-version
 tags
 tmp
-/Gemfile.lock
