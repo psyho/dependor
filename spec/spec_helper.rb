@@ -15,4 +15,3 @@ require 'rubygems'
 require 'rspec'
 
 require 'dependor'
-require 'dependor/shorty'
