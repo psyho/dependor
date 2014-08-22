@@ -1,7 +1,7 @@
 module Dependor
   class ObjectNotFound < StandardError
-    def initialize(object_name)
-      super("Object #{object_name} not found!")
+    def initialize(lookup)
+      super("Object #{lookup.current} not found! (#{lookup})")
     end
   end
 end

@@ -21,3 +21,4 @@ Dir["#{spec_support_dir}/**/*.rb"].each do |file|
 end
 
 require 'dependor'
+require 'dependor/core_ext'

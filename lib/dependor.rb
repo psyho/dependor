@@ -10,7 +10,9 @@ require "dependor/class_lookup"
 require "dependor/dependency_lookup"
 require "dependor/instantiator"
 require "dependor/object_not_found"
+require "dependor/dependency_loop_found"
 require "dependor/registry"
+require "dependor/lookup_chain"
 
 module Dependor
   def self.registry(&block)

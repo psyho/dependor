@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'dependor/core_ext'
 
 module Sample
   module Legend
@@ -69,6 +68,14 @@ describe "Automagic Injection" do
     expect(registry[:camelot]).to be_an_instance_of(Sample::Legend::Camelot)
   end
 
+  it "uses dependency overrides when constructing objects" do
+    expect(registry[:arthur].name).to eq("Arthur")
+  end
+
+  it "allows referring to other objects by name" do
+    expect(registry[:king]).to equal(registry[:arthur])
+  end
+
   it "makes objects singletons by default" do
     first_camelot = registry[:camelot]
     second_camelot = registry[:camelot]
@@ -81,5 +88,28 @@ describe "Automagic Injection" do
     second_horse = registry[:horse]
 
     expect(first_horse).not_to equal(second_horse)
+  end
+
+  it "raises ObjectNotFound for unknown objects" do
+    registry = Dependor.registry do
+      foo { bar + 1 }
+      bar { baz + 2 }
+    end
+
+    expect {
+      registry[:foo]
+    }.to raise_error(Dependor::ObjectNotFound)
+  end
+
+  it "does not allow dependency loops" do
+    registry = Dependor.registry do
+      foo { bar }
+      bar { baz }
+      baz { foo }
+    end
+
+    expect {
+      registry[:foo]
+    }.to raise_error(Dependor::DependencyLoopFound)
   end
 end

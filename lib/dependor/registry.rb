@@ -10,6 +10,7 @@ module Dependor
       @autoinject_modules = []
       @definitions = {}
       @objects = {}
+      @current_lookup = LookupChain.new
     end
 
     def configure(&block)
@@ -21,18 +22,22 @@ module Dependor
     def [](name)
       return @objects[name] if @objects.key?(name)
       definition = fetch_definition(name)
+      current_lookup.start(name)
       object = instantiator.instantiate(definition)
+      current_lookup.finish
       @objects[name] = object if definition.singleton?
       object
     end
 
     private
 
+    attr_reader :current_lookup
+
     def fetch_definition(name)
       return definitions[name] if definitions.key?(name)
       klass = class_lookup.lookup(name)
       return ObjectDefinition.default_for(klass) if klass
-      raise ObjectNotFound.new(name)
+      raise ObjectNotFound.new(current_lookup.copy_and_clear)
     end
 
     def class_lookup
