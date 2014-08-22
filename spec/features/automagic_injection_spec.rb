@@ -14,254 +14,280 @@ module Dependor
         takes.each do |name|
           instance_variable_set("@#{name}", dependencies.fetch(name))
         end
-
-        puts "Instantiating #{self.class}"
       end
     end
 
-    def takes(*dependency_names)
-      @takes ||= []
-      parent_takes = superclass.takes if superclass.respond_to?(:takes)
-      parent_takes ||= []
-      return @takes + parent_takes if dependency_names.empty?
-      @takes += dependency_names
-      attr_reader(*dependency_names)
-      include Constructor
+    module Takes
+      def takes(*dependency_names)
+        @takes ||= []
+
+        if dependency_names.empty?
+          parent_takes = superclass.takes if superclass.respond_to?(:takes)
+          parent_takes ||= []
+          return @takes + parent_takes
+        else
+          @takes += dependency_names
+          attr_reader(*dependency_names)
+        end
+      end
+    end
+
+    module Transient
+      def self.transient?(klass)
+        self > klass.singleton_class
+      end
     end
   end
 
-  ObjectName = Struct.new(:name) do
-    def symbolic_name
-      @symbolic_name ||= name.to_sym
+  ObjectDefinition = Struct.new(:name, :opts, :builder) do
+    def self.default_for(klass)
+      opts = {transient: Transient.transient?(klass)}
+      new(klass.name.to_sym, opts, proc{ new(klass) })
     end
 
-    def class_name
-      @class_name ||= name.to_s.gsub(/^\w/, &:upcase).gsub(/_\w/, &:upcase).gsub('_', '')
+    def singleton?
+      !opts[:transient]
     end
   end
 
   class RegistryConfiguration < BasicObject
-    def initialize(registry)
-      @registry = registry
-    end
-
-    def method_missing(name, options = {}, &block)
-      @registry.define(name, options, &block)
-    end
-  end
-
-  class Instantiator < BasicObject
-    def initialize(injector, parent_module)
-      @injector = injector
-      @parent_module = parent_module
-    end
-
-    def instantiate(block)
-      instance_eval(&block)
-    end
-
-    def new(class_name, dependency_overrides = {})
-      dependencies = dependency_overrides.dup
-      klass = __lookup_class__(class_name)
-
-      klass.takes.each do |name|
-        next if dependencies.key?(name)
-        dependencies[name] = @injector[name]
-      end
-
-      dependencies.empty? ? klass.new : klass.new(dependencies)
-    end
-
-    def method_missing(name, *args, &block)
-      @injector[name]
-    end
-
-    def __lookup_class__(name)
-      return name if name.is_a?(::Class)
-      object_name = ::Dependor::ObjectName.new(name)
-      @parent_module.const_get(object_name.class_name)
-    end
-  end
-
-  ObjectDefinition = Struct.new(:block, :parent_module, :prototype) do
-    def prototype?
-      prototype
-    end
-
-    def call(injector)
-      Instantiator.new(injector, parent_module).instantiate(block)
-    end
-  end
-
-  class Registry
-    def initialize(parent_module)
-      @parent_module = parent_module
-      @custom_definitions = {}
-    end
-
-    def configure(&block)
-      return unless block_given?
-      configuration = RegistryConfiguration.new(self)
+    def self.configure(&block)
+      configuration = new
       configuration.instance_eval(&block)
+      configuration
     end
 
-    def define(name, options = {}, &block)
-      name = ObjectName.new(name)
-      unless block
-        klass = class_for_name(name)
-        block = proc{ new(klass) }
-      end
-      custom_definitions[name] = ObjectDefinition.new(block, parent_module, options[:prototype])
+    attr_reader :__autoinject_modules__, :__definitions__
+
+    def initialize
+      @__autoinject_modules__ = []
+      @__definitions__ = {}
     end
 
-    def key?(name)
-      custom_definitions.key?(name) || !!class_for_name(name)
+    def autoinject(mod)
+      @__autoinject_modules__ << mod
     end
 
-    def fetch(name)
-      return custom_definitions.fetch(name) if custom_definitions.key?(name)
-      klass = class_for_name(name)
-      block = proc{ new(klass) }
-      ObjectDefinition.new(block, parent_module)
+    def method_missing(name, opts = {}, &block)
+      @__definitions__[name] = ObjectDefinition.new(name, opts, block)
+    end
+  end
+
+  class ClassLookup
+    def initialize(modules)
+      @modules = modules
+    end
+
+    def lookup(class_name)
+      class_name = camelize(class_name)
+      modules.lazy.map {|m| try_get_class(m, class_name) }.detect{ |klass| klass }
     end
 
     private
 
-    def block_for_name(name)
-    end
+    attr_reader :modules
 
-    def class_for_name(name)
-      parent_module.const_get(name.class_name)
+    def try_get_class(mod, class_name)
+      mod.const_get(class_name)
     rescue NameError
-      nil
     end
 
-    attr_reader :parent_module, :custom_definitions
+    def camelize(name)
+      name.to_s.gsub(/^\w/, &:upcase).gsub(/_\w/, &:upcase).gsub('_', '')
+    end
+  end
+
+  class DependencyLookup
+    def self.for_class(klass)
+      return [] unless klass.respond_to?(:takes)
+      klass.takes
+    end
+  end
+
+  class Instantiator < BasicObject
+    def initialize(class_lookup, injector)
+      @class_lookup = class_lookup
+      @injector = injector
+    end
+
+    def instantiate(definition)
+      instance_exec(&definition.builder)
+    end
+
+    def new(klass_name, overwrites = {})
+      klass = @class_lookup.lookup(klass_name)
+      dependencies = DependencyLookup.for_class(klass)
+      return klass.new if dependencies.empty?
+      args = {}
+      dependencies.each do |name|
+        args[name] = overwrites.fetch(name) { @injector[name] }
+      end
+      klass.new(args)
+    end
+
+    def method_missing(name, *args, &block)
+      super if args.any?
+      @injector[name]
+    end
   end
 
   class ObjectNotFound < StandardError
-    def initialize(name, current_lookup)
-      path = current_lookup.map(&:symbolic_name).join(' -> ')
-      super("Could not find object: #{name.symbolic_name} (#{path}) in any of the registries!")
+    def initialize(object_name)
+      super("Object #{object_name} not found!")
     end
   end
 
-  class Injector
-    def initialize(*registries)
-      @registries = registries
+  class Registry
+    def self.build(&block)
+      registry = new
+      registry.configure(&block)
+      registry
+    end
+
+    def initialize
+      @autoinject_modules = []
+      @definitions = {}
       @objects = {}
-      @current_lookup = []
+    end
+
+    def configure(&block)
+      configuration = RegistryConfiguration.configure(&block)
+      @autoinject_modules += configuration.__autoinject_modules__
+      @definitions = definitions.merge(configuration.__definitions__)
     end
 
     def [](name)
-      object_name = ObjectName.new(name)
-      key = object_name.symbolic_name
-      return objects[key] if objects.key?(key)
-
-      current_lookup << object_name
-      object_definition = find_in_registries(object_name)
-      object = object_definition.call(self)
-      current_lookup.pop
-      objects[key] = object unless object_definition.prototype?
+      return @objects[name] if @objects.key?(name)
+      definition = fetch_definition(name)
+      object = instantiator.instantiate(definition)
+      @objects[name] = object if definition.singleton?
       object
     end
 
     private
 
-    def find_in_registries(name)
-      registry = registries.detect{|r| r.key?(name)}
-      raise ObjectNotFound.new(name, current_lookup) unless registry
-      registry.fetch(name)
+    def fetch_definition(name)
+      return definitions[name] if definitions.key?(name)
+      klass = class_lookup.lookup(name)
+      return ObjectDefinition.default_for(klass) if klass
+      raise ObjectNotFound.new(name)
     end
 
-    attr_reader :registries, :objects, :current_lookup
+    def class_lookup
+      ClassLookup.new(autoinject_modules)
+    end
+
+    def instantiator
+      Instantiator.new(class_lookup, self)
+    end
+
+    attr_reader :autoinject_modules, :definitions
   end
 
-  def self.registry(parent_module, &block)
-    registry = Registry.new(parent_module)
-    registry.configure(&block)
-    registry
-  end
-
-  def self.injector(*registries)
-    Injector.new(*registries)
+  def self.registry(&block)
+    Registry.build(&block)
   end
 end
 
-Object.extend Dependor::Injectable
+module Dependor
+  module CoreExt
+    def Takes(*dependency_names)
+      Module.new do
+        define_singleton_method :extended do |klass|
+          klass.send(:include, Dependor::Injectable::Constructor)
+          klass.extend Dependor::Injectable::Takes
+          klass.takes(*dependency_names)
+        end
+      end
+    end
+  end
+end
+
+
+Object.extend Dependor::CoreExt
+Transient = Dependor::Injectable::Transient
 
 module Sample
   module Legend
     class Camelot
-      takes :king, :knights
+      extend Takes(:king, :knights)
     end
 
     class Knight
-      takes :name, :horse, :sword, :quest
+      extend Takes(:name, :horse, :sword, :quest)
     end
 
     class King < Knight
-      takes :crown
+      extend Takes(:crown)
     end
 
     class Horse
-      include Dependor::Injectable::Constructor
+      extend Transient
     end
 
     class Quest
-      takes :name
+      extend Takes(:name)
     end
 
     class Sword
-      include Dependor::Injectable::Constructor
+      extend Transient
     end
 
     class Crown
-      include Dependor::Injectable::Constructor
+      extend Transient
     end
 
     class MagicalSword < Sword
-      takes :name
+      extend Takes(:name)
     end
   end
 end
 
 describe "Automagic Injection" do
-  legend = Dependor.registry(Sample::Legend) do
-    sword(prototype: true)
-    horse(prototype: true)
+  let(:legend) {
+    Dependor.registry do
+      autoinject(Sample::Legend)
 
-    lancelot {
-      new(:Knight,
-          name: "Lancelot",
-          quest: new(:Quest, name: "Lancelot & The Dragon"))
-    }
-    galahad {
-      new(:Knight,
-          name: "Galahad",
-          quest: new(:Quest, name: "The Green Knight"))
-    }
-    arthur {
-      new(:King,
-          name: "Arthur",
-          sword: excalibur,
-          horse: new(:Horse),
-          quest: new(:Quest, name: "The Holy Grail"))
-    }
-    #knight_provider { |name, quest|
-      #new(:Knight,
-          #name: name,
-          #quest: new(:Quest, name: quest))
-    #}
-    excalibur { new(:MagicalSword, name: "Excalibur") }
-    king { arthur }
-    knights { [lancelot, galahad] }
-  end
+      lancelot {
+        new(:Knight,
+            name: "Lancelot",
+            quest: new(:Quest, name: "Lancelot & The Dragon"))
+      }
+      galahad {
+        new(:Knight,
+            name: "Galahad",
+            quest: new(:Quest, name: "The Green Knight"))
+      }
+      arthur {
+        new(:King,
+            name: "Arthur",
+            sword: excalibur,
+            horse: new(:Horse),
+            quest: new(:Quest, name: "The Holy Grail"))
+      }
+      excalibur { new(:MagicalSword, name: "Excalibur") }
+      king { arthur }
+      knights { [lancelot, galahad] }
+    end
+  }
 
-  let(:injector) { Dependor.injector(legend) }
+  let(:injector) { legend }
 
   it "injects objects from given modules by name" do
-    injector[:camelot]
     expect(injector[:camelot]).to be_an_instance_of(Sample::Legend::Camelot)
+  end
+
+  it "makes objects singletons by default" do
+    first_camelot = injector[:camelot]
+    second_camelot = injector[:camelot]
+
+    expect(first_camelot).to equal(second_camelot)
+  end
+
+  it "returns a new instance every time for transient objects" do
+    first_horse = injector[:horse]
+    second_horse = injector[:horse]
+
+    expect(first_horse).not_to equal(second_horse)
   end
 end
