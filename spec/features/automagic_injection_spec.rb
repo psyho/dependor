@@ -38,7 +38,7 @@ module Sample
 end
 
 describe "Automagic Injection" do
-  let(:legend) {
+  let(:registry) {
     Dependor.registry do
       autoinject(Sample::Legend)
 
@@ -65,22 +65,20 @@ describe "Automagic Injection" do
     end
   }
 
-  let(:injector) { legend }
-
   it "injects objects from given modules by name" do
-    expect(injector[:camelot]).to be_an_instance_of(Sample::Legend::Camelot)
+    expect(registry[:camelot]).to be_an_instance_of(Sample::Legend::Camelot)
   end
 
   it "makes objects singletons by default" do
-    first_camelot = injector[:camelot]
-    second_camelot = injector[:camelot]
+    first_camelot = registry[:camelot]
+    second_camelot = registry[:camelot]
 
     expect(first_camelot).to equal(second_camelot)
   end
 
   it "returns a new instance every time for transient objects" do
-    first_horse = injector[:horse]
-    second_horse = injector[:horse]
+    first_horse = registry[:horse]
+    second_horse = registry[:horse]
 
     expect(first_horse).not_to equal(second_horse)
   end
