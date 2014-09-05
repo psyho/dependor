@@ -18,7 +18,7 @@ module Dependor
     end
 
     def method_missing(name, opts = {}, &block)
-      @__definitions__[name] = ObjectDefinition.new(name, opts, block)
+      @__definitions__[name] = ObjectDefinition.build(name, opts, &block)
     end
   end
 end

@@ -5,6 +5,11 @@ module Dependor
       new(klass.name.to_sym, opts, proc{ new(klass) })
     end
 
+    def self.build(name, transient: false, &block)
+      block ||= proc{ new(name) }
+      new(name, {transient: transient}, block)
+    end
+
     def singleton?
       !opts[:transient]
     end
