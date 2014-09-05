@@ -19,7 +19,7 @@ module Dependor
     Registry.build(&block)
   end
 
-  def self.Takes(*dependency_names)
+  def self.takes(*dependency_names)
     TakesExt.Takes(*dependency_names)
   end
 end
