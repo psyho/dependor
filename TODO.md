@@ -6,7 +6,6 @@
 * detect dependencies on classes that don't extend Takes
 * detect dependencies in 1.9.3 (positional args) and 2.0 (keyword args) formats
 * allow defining providers
-* cycle detection + better error message in object not found
 * combining injectors
 * overwriting dependencies for a single call
 * wrapping returned objects
