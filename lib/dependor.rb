@@ -14,6 +14,10 @@ require "dependor/dependency_loop_found"
 require "dependor/registry"
 require "dependor/lookup_chain"
 
+require "dependor/injectable_class"
+require "dependor/class_takes_ext"
+require "dependor/subclass_builder"
+
 module Dependor
   def self.registry(&block)
     Registry.build(&block)
@@ -21,5 +25,9 @@ module Dependor
 
   def self.takes(*dependency_names)
     TakesExt.Takes(*dependency_names)
+  end
+
+  def self.class_takes(*dependency_names)
+    ClassTakesExt.ClassTakes(*dependency_names)
   end
 end

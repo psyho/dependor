@@ -41,7 +41,7 @@ Feature: Class Injections
     """
     Then the output should be:
     """
-    "For the King!"
-    "Welcome to FarFarAway's army, fellow Sword Master."
+    For the King!
+    Welcome to FarFarAway's army, fellow Sword Master.
     """
 
