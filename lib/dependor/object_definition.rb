@@ -5,7 +5,10 @@ module Dependor
       new(klass.name.to_sym, opts, proc{ new(klass) })
     end
 
-    def self.build(name, transient: false, &block)
+    def self.build(name, transient: false, as: :instance, &block)
+      if as == :class
+        block ||= proc{ get_class(name) }
+      end
       block ||= proc{ new(name) }
       new(name, {transient: transient}, block)
     end

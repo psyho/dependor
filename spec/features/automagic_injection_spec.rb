@@ -33,6 +33,10 @@ module Sample
     class MagicalSword < Sword
       extend Takes(:name)
     end
+
+    class Kingdom
+      extend ClassTakes(:king, :name)
+    end
   end
 end
 
@@ -61,6 +65,7 @@ describe "Automagic Injection" do
       excalibur { new(:MagicalSword, name: "Excalibur") }
       king { arthur }
       knights { [lancelot, galahad] }
+      kingdom { get_class(:Kingdom, name: "Far Far Away") }
     end
   }
 
@@ -74,6 +79,14 @@ describe "Automagic Injection" do
 
   it "allows referring to other objects by name" do
     expect(registry[:king]).to equal(registry[:arthur])
+  end
+
+  it "allows class injections" do
+    expect(registry[:kingdom]).to be_an_instance_of(Class)
+  end
+
+  it "allows for overrides when injecting classes" do
+    expect(registry[:kingdom].name).to eq("Far Far Away")
   end
 
   it "makes objects singletons by default" do

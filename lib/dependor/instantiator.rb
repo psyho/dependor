@@ -20,6 +20,11 @@ module Dependor
       klass.new(args)
     end
 
+    def get_class(klass_name, overwrites = {})
+      klass = @class_lookup.lookup(klass_name)
+      SubclassBuilder.subclass(klass, @injector, overwrites)
+    end
+
     def method_missing(name, *args, &block)
       super if args.any?
       @injector[name]
