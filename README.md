@@ -83,7 +83,7 @@ class Injector
 end
 
 class EntryPoint
-  include Dependor::Injectable
+  extend Dependor::Injectable
   inject_from Injector
   
   inject :bar
