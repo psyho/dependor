@@ -13,7 +13,7 @@ describe Dependor::Instantiator do
     end
 
     instance = instantiator.instantiate(klass)
-    instance.foo.should == "foo"
+    expect(instance.foo).to eq("foo")
   end
 
   it "instantiates objects with constructors" do
@@ -27,12 +27,12 @@ describe Dependor::Instantiator do
       end
     end
 
-    injector.should_receive(:get).with(:foo).and_return("foo")
-    injector.should_receive(:get).with(:bar).and_return("bar")
-    injector.should_receive(:get).with(:baz).and_return("baz")
+    expect(injector).to receive(:get).with(:foo).and_return("foo")
+    expect(injector).to receive(:get).with(:bar).and_return("bar")
+    expect(injector).to receive(:get).with(:baz).and_return("baz")
 
     instance = instantiator.instantiate(klass)
 
-    instance.foo.should == 'foo-bar-baz'
+    expect(instance.foo).to eq('foo-bar-baz')
   end
 end

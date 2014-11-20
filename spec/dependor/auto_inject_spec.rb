@@ -49,11 +49,11 @@ describe Dependor::AutoInject do
 
   shared_examples_for 'dependency injector' do
     it 'responds to the object name' do
-      injector.should respond_to(object_name)
+      expect(injector).to respond_to(object_name)
     end
 
     it 'creates the object' do
-      injector.send(object_name).should be_an_instance_of(object_class)
+      expect(injector.send(object_name)).to be_an_instance_of(object_class)
     end
   end
 
@@ -87,11 +87,11 @@ describe Dependor::AutoInject do
 
   context 'autoinjecting with custom dependencies' do
     it "injects the dependencies which are not explicitly specified" do
-      injector.create_foo("the foo name").sample_class_with_no_dependencies.should be_an_instance_of(SampleClassWithNoDependencies)
+      expect(injector.create_foo("the foo name").sample_class_with_no_dependencies).to be_an_instance_of(SampleClassWithNoDependencies)
     end
 
     it "passes through the dependencies that were specified" do
-      injector.create_foo("the foo name").foo.should == "the foo name"
+      expect(injector.create_foo("the foo name").foo).to eq("the foo name")
     end
   end
 
@@ -99,16 +99,16 @@ describe Dependor::AutoInject do
     it "injects factory methods as procs" do
       object = injector.depends_on_factory_method
 
-      object.create_foo.call("test").foo.should == "test"
+      expect(object.create_foo.call("test").foo).to eq("test")
     end
   end
 
   it "raises an error if the object is not found" do
-    proc{ injector.unknown_object }.should raise_exception(Dependor::UnknownObject)
+    expect{ injector.unknown_object }.to raise_exception(Dependor::UnknownObject)
   end
 
   it 'responds to regular methods on injector' do
-    injector.should respond_to(:manual_dep)
+    expect(injector).to respond_to(:manual_dep)
   end
 
 end

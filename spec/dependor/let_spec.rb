@@ -8,6 +8,6 @@ describe Dependor::Let do
   end
 
   it 'shortens method declaration' do
-    SampleClassUsingLet.new.foo.should == "foo foo"
+    expect(SampleClassUsingLet.new.foo).to eq("foo foo")
   end
 end

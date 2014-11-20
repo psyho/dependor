@@ -11,6 +11,6 @@ describe 'Dependor::Constructor' do
 
   it 'defines a constructor with given parameters' do
     sample = SampleClassUsingConstructor.new('aaa', 'bbb', 'ccc')
-    sample.as_instance_variables.should == {foo: 'aaa', bar: 'bbb', baz: 'ccc'}
+    expect(sample.as_instance_variables).to eq({foo: 'aaa', bar: 'bbb', baz: 'ccc'})
   end
 end
