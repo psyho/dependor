@@ -10,6 +10,7 @@ module Dependor
   autoload :Injectable,           'dependor/injectable'
   autoload :Instantiator,         'dependor/instantiator'
   autoload :Isolate,              'dependor/isolate'
+  autoload :Singleton,            'dependor/singleton'
   autoload :Let,                  'dependor/let'
   autoload :SendingInjector,      'dependor/sending_injector'
   autoload :Shorty,               'dependor/shorty'

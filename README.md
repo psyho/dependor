@@ -249,7 +249,7 @@ require 'dependor/shorty'
 
 class MyInjector
   include Dependor::AutoInject
-  
+
   takes :params, :session, :request
 
   def foo
@@ -270,6 +270,38 @@ class PostsController < ApplicationController
 
   def get
     render text: foo
+  end
+end
+```
+
+## Dependor::Singleton
+
+You can include this to make your service class as a singleton.
+
+```ruby
+class FooService
+  include Dependor::Singleton
+end
+
+class MyInjector
+  include Dependor::AutoInject
+
+  takes :params, :session, :request
+end
+
+class ApplicationController
+  extend Dependor::Injectable
+
+  def injector
+    @injector ||= MyInjector.new(params, session, request)
+  end
+end
+
+class PostsController < ApplicationController
+  inject :foo_service
+
+  def get
+    render text: foo_service.object_id == foo_service.object_id # true
   end
 end
 ```
